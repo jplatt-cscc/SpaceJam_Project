@@ -3,7 +3,7 @@ from panda3d.core import *
 
 
 def Cloud(radius = 1):
-
+    """ Random cluster drone pattern """
     x = 2 * random.random() - 1
     y = 2 * random.random() - 1
     z = 2 * random.random() - 1
@@ -12,6 +12,7 @@ def Cloud(radius = 1):
     return UnitVector * radius
 
 def BaseballSeams(step, numSeams, B, F = 1):
+    """ Baseball seam ring drone pattern """
     # Complicated math
     time = step / float(numSeams) * 2 * math.pi
     F4 = 0
