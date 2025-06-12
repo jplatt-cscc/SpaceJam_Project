@@ -66,6 +66,21 @@ class SpaceJam(ShowBase):
         self.Planet6.setScale(350)
         Planet6Text = self.loader.loadTexture('./Assets/Planets/texture_planet_6.png')
         self.Planet6.setTexture(Planet6Text, 1)
+        # Space Station
+        # Space Station model & texture
+        self.SpaceStation = self.loader.loadModel('./Assets/Space Stations/spaceStation.x')
+        SpaceStationText = self.loader.loadTexture('./Assets/Space Stations/SpaceStation1_Dif2.png')
+        self.SpaceStation.setTexture(SpaceStationText, 1)
+        self.SpaceStation.setPos(4567, -934, 123)
+        self.SpaceStation.setScale(250)
+        self.SpaceStation.reparentTo(self.render)
+        # Player
+        # Space Ship model & texture
+        self.Player = self.loader.loadModel('./Assets/Spaceships/Dumbledore.x')
+        PlayerText = self.loader.loadTexture('./Assets/Spaceships/spacejet_C.png')
+        self.Player.setTexture(PlayerText, 1)
+        self.Player.setScale(50)
+        self.Player.reparentTo(self.render)
 
 
 app = SpaceJam()
