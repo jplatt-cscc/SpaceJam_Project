@@ -11,6 +11,7 @@ def Cloud(radius = 1):
     UnitVector.normalize()
     return UnitVector * radius
 
+
 def BaseballSeams(step, numSeams, B, F = 1):
     """ Baseball seam ring drone pattern """
     # Complicated math
@@ -26,3 +27,14 @@ def BaseballSeams(step, numSeams, B, F = 1):
     z = R * zzz / rrr
     return Vec3(x, y, z)
 
+
+def CircleX(self):
+    pass
+
+
+def CircleY(self):
+    pass
+
+
+def CircleZ(self):
+    pass

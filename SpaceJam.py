@@ -26,10 +26,23 @@ class SpaceJam(ShowBase):
         # Drones
         FullCycle = 60
         for j in range(FullCycle):
-            SpaceJamClasses.Drones.DroneCount += 1
             NickName = 'Drone' + str(SpaceJamClasses.Drones.DroneCount)
             self.DrawCloudDefense(self.Planet1, NickName)
+            SpaceJamClasses.Drones.DroneCount += 1
+            self.DrawCloudDefense(self.Planet2, NickName)
+            SpaceJamClasses.Drones.DroneCount += 1
+            self.DrawCloudDefense(self.Planet3, NickName)
+            SpaceJamClasses.Drones.DroneCount += 1
+            self.DrawCloudDefense(self.Planet4, NickName)
+            SpaceJamClasses.Drones.DroneCount += 1
+            self.DrawCloudDefense(self.Planet5, NickName)
+            SpaceJamClasses.Drones.DroneCount += 1
+            self.DrawCloudDefense(self.Planet6, NickName)
+            SpaceJamClasses.Drones.DroneCount += 1
             self.DrawBaseballSeams(self.SpaceStation, NickName, j, FullCycle, 2)
+            SpaceJamClasses.Drones.DroneCount += 1
+            # Added to DroneCount multiple times because otherwise it only counts 1 per loop no matter how many are spawned
+        print(SpaceJamClasses.Drones.DroneCount)
         
     
     def DrawBaseballSeams(self, centralObject, droneName, step, numSeams, radius = 1):
