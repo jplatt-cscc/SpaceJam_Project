@@ -1,4 +1,4 @@
-# Joshua Platt, 6/12/25, CSCI-1511, "Project #1" Space Jam Assignment
+# 6/12/25, CSCI-1511, "Project #1" Space Jam Assignment
 
 # Imports
 from direct.showbase.ShowBase import ShowBase
