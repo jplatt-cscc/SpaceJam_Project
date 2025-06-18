@@ -28,13 +28,31 @@ def BaseballSeams(step, numSeams, B, F = 1):
     return Vec3(x, y, z)
 
 
-def CircleX(self):
-    pass
+def CircleY(x):
+    theta = x
+    x = 50.0 * math.cos(theta)
+    y = 50.0 * math.sin(theta)
+    z = 0.0 * math.tan(theta)
+    UnitVector = Vec3(x, y, z)
+    UnitVector.normalize()
+    return UnitVector
 
 
-def CircleY(self):
-    pass
+def CircleX(x):
+    theta = x
+    x = 0.0 * math.tan(theta)
+    y = 50.0 * math.sin(theta)
+    z = 50.0 * math.cos(theta)
+    UnitVector = Vec3(x, y, z)
+    UnitVector.normalize()
+    return UnitVector
 
 
-def CircleZ(self):
-    pass
+def CircleZ(x):
+    theta = x
+    x = 50.0 * math.cos(theta)
+    y = 0.0 * math.tan(theta)
+    z = 50.0 * math.sin(theta)
+    UnitVector = Vec3(x, y, z)
+    UnitVector.normalize()
+    return UnitVector

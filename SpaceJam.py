@@ -15,17 +15,18 @@ class SpaceJam(ShowBase):
         # Calls SpaceJamClasses file multiple times to setup & initialize the scene/camera
         self.Universe = SpaceJamClasses.Universe(self.loader, './Assets/Universe/Universe.x', self.render, 'Universe', './Assets/Universe/Starbasesnow.png', (0, 0, 0), 15000)
         self.Planet1 = SpaceJamClasses.Planet(self.loader, './Assets/Planets/protoPlanet.x', self.render, 'Planet1', './Assets/Planets/texture_planet_1.png', (150, 5000, 67), 350)
-        self.Planet2 = SpaceJamClasses.Planet(self.loader, './Assets/Planets/protoPlanet.x', self.render, 'Planet2', './Assets/Planets/texture_planet_2.png', (1500, 500, 99), 350)
-        self.Planet3 = SpaceJamClasses.Planet(self.loader, './Assets/Planets/protoPlanet.x', self.render, 'Planet3', './Assets/Planets/texture_planet_3.png', (15, 50, 670), 350)
+        self.Planet2 = SpaceJamClasses.Planet(self.loader, './Assets/Planets/protoPlanet.x', self.render, 'Planet2', './Assets/Planets/texture_planet_2.png', (1500, 500, 990), 350)
+        self.Planet3 = SpaceJamClasses.Planet(self.loader, './Assets/Planets/protoPlanet.x', self.render, 'Planet3', './Assets/Planets/texture_planet_3.png', (15, 50, 6700), 350)
         self.Planet4 = SpaceJamClasses.Planet(self.loader, './Assets/Planets/protoPlanet.x', self.render, 'Planet4', './Assets/Planets/texture_planet_4.png', (350, -7000, 33), 350)
-        self.Planet5 = SpaceJamClasses.Planet(self.loader, './Assets/Planets/protoPlanet.x', self.render, 'Planet5', './Assets/Planets/texture_planet_5.png', (133, 750, -999), 350)
-        self.Planet6 = SpaceJamClasses.Planet(self.loader, './Assets/Planets/protoPlanet.x', self.render, 'Planet6', './Assets/Planets/texture_planet_6.png', (-2000, 5, 300), 350)
+        self.Planet5 = SpaceJamClasses.Planet(self.loader, './Assets/Planets/protoPlanet.x', self.render, 'Planet5', './Assets/Planets/texture_planet_5.png', (133, 7500, -999), 350)
+        self.Planet6 = SpaceJamClasses.Planet(self.loader, './Assets/Planets/protoPlanet.x', self.render, 'Planet6', './Assets/Planets/texture_planet_6.png', (-2000, 50, 300), 350)
         self.SpaceStation = SpaceJamClasses.SpaceStation(self.loader, './Assets/Space Stations/spaceStation.x', self.render, 'Space Station', './Assets/Space Stations/SpaceStation1_Dif2.png', (4567, -934, 123), 40)
-        self.Player = SpaceJamClasses.Player(self.loader, './Assets/Spaceships/Dumbledore.x', self.render, 'Player', './Assets/Spaceships/spacejet_C.png', (0, 0, 0), 50)
+        self.Player = SpaceJamClasses.Player(self.loader, './Assets/Spaceships/Dumbledore.x', self.render, 'Player', './Assets/Spaceships/spacejet_C.png', (0, 0, 0), 15)
 
         # Drones
         FullCycle = 60
-        for j in range(FullCycle):
+        x = 0
+        for i in range(FullCycle):
             NickName = 'Drone' + str(SpaceJamClasses.Drones.DroneCount)
             self.DrawCloudDefense(self.Planet1, NickName)
             SpaceJamClasses.Drones.DroneCount += 1
@@ -39,9 +40,17 @@ class SpaceJam(ShowBase):
             SpaceJamClasses.Drones.DroneCount += 1
             self.DrawCloudDefense(self.Planet6, NickName)
             SpaceJamClasses.Drones.DroneCount += 1
-            self.DrawBaseballSeams(self.SpaceStation, NickName, j, FullCycle, 2)
+            self.DrawBaseballSeams(self.SpaceStation, NickName, i, FullCycle, 2)
             SpaceJamClasses.Drones.DroneCount += 1
+            self.DrawCircleY(x, NickName)
+            SpaceJamClasses.Drones.DroneCount += 1
+            self.DrawCircleX(x, NickName)
+            SpaceJamClasses.Drones.DroneCount += 1
+            self.DrawCircleZ(x, NickName)
+            SpaceJamClasses.Drones.DroneCount += 1
+            x = x + 0.105
             # Added to DroneCount multiple times because otherwise it only counts 1 per loop no matter how many are spawned
+        
         print(SpaceJamClasses.Drones.DroneCount)
         
     
@@ -57,6 +66,27 @@ class SpaceJam(ShowBase):
         UnitVector.normalize()
         position = UnitVector * 500 + centralObject.modelNode.getPos()
         SpaceJamClasses.Drones(self.loader, './Assets/Drone Defender/DroneDefender.obj', self.render, droneName, './Assets/Drone Defender/octotoad1_auv.png', position, 10)
+
+    
+    def DrawCircleY(self, x, droneName):
+        UnitVector = DefensePaths.CircleY(x)
+        UnitVector.normalize()
+        position = UnitVector * 100
+        SpaceJamClasses.Drones(self.loader, './Assets/Drone Defender/DroneDefender.obj', self.render, droneName, './Assets/Drone Defender/blue.jpg', position, 1)
+
+    
+    def DrawCircleX(self, x, droneName):
+        UnitVector = DefensePaths.CircleX(x)
+        UnitVector.normalize()
+        position = UnitVector * 100
+        SpaceJamClasses.Drones(self.loader, './Assets/Drone Defender/DroneDefender.obj', self.render, droneName, './Assets/Drone Defender/red.jpg', position, 1)
+
+
+    def DrawCircleZ(self, x, droneName):
+        UnitVector = DefensePaths.CircleZ(x)
+        UnitVector.normalize()
+        position = UnitVector * 100
+        SpaceJamClasses.Drones(self.loader, './Assets/Drone Defender/DroneDefender.obj', self.render, droneName, './Assets/Drone Defender/green.jpg', position, 1)
 
 
 app = SpaceJam()
