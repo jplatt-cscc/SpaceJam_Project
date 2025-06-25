@@ -1,9 +1,10 @@
-# 6/12/25, CSCI-1511, "Project #2" Space Jam Assignment
+# 6/25/25, CSCI-1511, "Project #3" Space Jam Assignment
 
 # Imports
 from direct.showbase.ShowBase import ShowBase
 import SpaceJamClasses as SpaceJamClasses
 import DefensePaths as DefensePaths
+import sys
 
 class SpaceJam(ShowBase):
     """ Main Class """
@@ -52,6 +53,14 @@ class SpaceJam(ShowBase):
             # Added to DroneCount multiple times because otherwise it only counts 1 per loop no matter how many are spawned
         
         print(SpaceJamClasses.Drones.DroneCount)
+
+        #Controls
+        self.SetCamera()
+        # Player movement
+        SpaceJamClasses.Player.SetKeyBindings(self.Player)
+        # Quit game keybind
+        self.accept('escape', self.quit)
+        
         
     
     def DrawBaseballSeams(self, centralObject, droneName, step, numSeams, radius = 1):
@@ -87,6 +96,18 @@ class SpaceJam(ShowBase):
         UnitVector.normalize()
         position = UnitVector * 100
         SpaceJamClasses.Drones(self.loader, './Assets/Drone Defender/DroneDefender.obj', self.render, droneName, './Assets/Drone Defender/green.jpg', position, 1)
+    
+
+    def SetCamera(self):
+        """ Sets player camera """
+        self.disableMouse()
+        self.camera.reparentTo(self.Player.modelNode)
+        self.camera.setFluidPos(0, -10, 0)
+    
+
+    def quit(self):
+        """ Allows for quiting the game """
+        sys.exit()
 
 
 app = SpaceJam()
