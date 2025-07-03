@@ -1,10 +1,13 @@
-# 6/25/25, CSCI-1511, "Project #3" Space Jam Assignment
+# 7/2/25, CSCI-1511, "Project #4" Space Jam Assignment
 
 # Imports
 from direct.showbase.ShowBase import ShowBase
+from panda3d.core import CollisionTraverser, CollisionHandlerPusher
 import SpaceJamClasses as SpaceJamClasses
 import DefensePaths as DefensePaths
+import Player as PlayerClass
 import sys
+
 
 class SpaceJam(ShowBase):
     """ Main Class """
@@ -13,18 +16,46 @@ class SpaceJam(ShowBase):
         """ The Constructor """
         # Calls the Constructor to initialize it
         ShowBase.__init__(self)
-        # Calls SpaceJamClasses file multiple times to setup & initialize the scene/camera
-        self.Universe = SpaceJamClasses.Universe(self.loader, './Assets/Universe/Universe.x', self.render, 'Universe', './Assets/Universe/Starbasesnow.png', (0, 0, 0), 15000)
-        self.Planet1 = SpaceJamClasses.Planet(self.loader, './Assets/Planets/protoPlanet.x', self.render, 'Planet1', './Assets/Planets/texture_planet_1.png', (150, 5000, 67), 350)
-        self.Planet2 = SpaceJamClasses.Planet(self.loader, './Assets/Planets/protoPlanet.x', self.render, 'Planet2', './Assets/Planets/texture_planet_2.png', (1500, 500, 990), 350)
-        self.Planet3 = SpaceJamClasses.Planet(self.loader, './Assets/Planets/protoPlanet.x', self.render, 'Planet3', './Assets/Planets/texture_planet_3.png', (15, 50, 6700), 350)
-        self.Planet4 = SpaceJamClasses.Planet(self.loader, './Assets/Planets/protoPlanet.x', self.render, 'Planet4', './Assets/Planets/texture_planet_4.png', (350, -7000, 33), 350)
-        self.Planet5 = SpaceJamClasses.Planet(self.loader, './Assets/Planets/protoPlanet.x', self.render, 'Planet5', './Assets/Planets/texture_planet_5.png', (133, 7500, -999), 350)
-        self.Planet6 = SpaceJamClasses.Planet(self.loader, './Assets/Planets/protoPlanet.x', self.render, 'Planet6', './Assets/Planets/texture_planet_6.png', (-2000, 50, 300), 350)
-        self.SpaceStation = SpaceJamClasses.SpaceStation(self.loader, './Assets/Space Stations/spaceStation.x', self.render, 'Space Station', './Assets/Space Stations/SpaceStation1_Dif2.png', (4567, -934, 123), 40)
-        self.Player = SpaceJamClasses.Player(self.loader, './Assets/Spaceships/Dumbledore.x', self.render, 'Player', './Assets/Spaceships/spacejet_C.png', (0, 0, 0), 10)
 
-        # Drones
+        # Loads models/scene
+        self.SetScene()
+
+        # Spawns drones
+        self.SpawnDrones()
+        print(f'Drone Count: {SpaceJamClasses.Drones.DroneCount}')
+
+        #Controls
+        self.SetCamera()
+        # Player movement
+        PlayerClass.Ship.SetKeyBindings(self.Player)
+        # Quit game keybind
+        self.accept('escape', self.quit)
+
+        # Collisions
+        self.cTrav = CollisionTraverser()
+        self.cTrav.traverse(self.render)
+        self.pusher = CollisionHandlerPusher()
+        self.pusher.addCollider(self.Player.collisionNode, self.Player.modelNode)
+        self.cTrav.addCollider(self.Player.collisionNode, self.pusher)
+        # Debug Option
+        self.cTrav.showCollisions(self.render)
+
+
+    def SetScene(self):
+        """ Calls SpaceJamClasses file multiple times to setup & initialize the scene/camera """
+        self.Universe = SpaceJamClasses.Universe(self.loader, './Assets/Universe/Universe.x', self.render, 'Universe', './Assets/Universe/Starbasesnow.png', (0, 0, 0), 15000)
+        self.Planet1 = SpaceJamClasses.Planet(self.loader, './Assets/Planets/protoPlanet.x', self.render, 'Planet1', './Assets/Planets/texture_planet_1.jpg', (150, 5000, 67), 350)
+        self.Planet2 = SpaceJamClasses.Planet(self.loader, './Assets/Planets/protoPlanet.x', self.render, 'Planet2', './Assets/Planets/texture_planet_2.jpg', (1500, 500, 990), 350)
+        self.Planet3 = SpaceJamClasses.Planet(self.loader, './Assets/Planets/protoPlanet.x', self.render, 'Planet3', './Assets/Planets/texture_planet_3.jpg', (15, 50, 6700), 350)
+        self.Planet4 = SpaceJamClasses.Planet(self.loader, './Assets/Planets/protoPlanet.x', self.render, 'Planet4', './Assets/Planets/texture_planet_4.jpg', (350, -7000, 33), 350)
+        self.Planet5 = SpaceJamClasses.Planet(self.loader, './Assets/Planets/protoPlanet.x', self.render, 'Planet5', './Assets/Planets/texture_planet_5.jpg', (133, 7500, -999), 350)
+        self.Planet6 = SpaceJamClasses.Planet(self.loader, './Assets/Planets/protoPlanet.x', self.render, 'Planet6', './Assets/Planets/texture_planet_6.jpg', (-2000, 50, 300), 350)
+        self.SpaceStation = SpaceJamClasses.SpaceStation(self.loader, './Assets/Space Stations/spaceStation.x', self.render, 'Space Station', './Assets/Space Stations/SpaceStation1_Dif2.png', (4567, -934, 123), 40)
+        self.Player = PlayerClass.Ship(self.loader, self.taskMgr, self.accept, './Assets/Spaceships/Dumbledore.x', self.render, 'Player', './Assets/Spaceships/spacejet_C.png', (0, 0, 0), 10)
+    
+
+    def SpawnDrones(self):
+        """ Spawns all drones/drone patterns """
         FullCycle = 60
         x = 0
         for i in range(FullCycle):
@@ -51,16 +82,6 @@ class SpaceJam(ShowBase):
             SpaceJamClasses.Drones.DroneCount += 1
             x = x + 0.105
             # Added to DroneCount multiple times because otherwise it only counts 1 per loop no matter how many are spawned
-        
-        print(SpaceJamClasses.Drones.DroneCount)
-
-        #Controls
-        self.SetCamera()
-        # Player movement
-        SpaceJamClasses.Player.SetKeyBindings(self.Player)
-        # Quit game keybind
-        self.accept('escape', self.quit)
-        
         
     
     def DrawBaseballSeams(self, centralObject, droneName, step, numSeams, radius = 1):
@@ -102,7 +123,9 @@ class SpaceJam(ShowBase):
         """ Sets player camera """
         self.disableMouse()
         self.camera.reparentTo(self.Player.modelNode)
-        self.camera.setFluidPos(0, -10, 0)
+        # Sets the camera behind the ship's engines
+        self.camera.setFluidPos(0, 0, 20)
+        self.camera.setHpr(180, -90, -180)
     
 
     def quit(self):
