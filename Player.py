@@ -61,7 +61,7 @@ class Ship(SphereCollider):
         if self.missileBay:
             travRate = self.missileDistance
             # Get the front of the Ship
-            aim = self.render.getRelativeVector(self.modelNode, Vec3.forward())
+            aim = self.render.getRelativeVector(self.modelNode, Vec3.down())
             aim.normalize()
             fireSolution = aim * travRate
             # Missile spawns 100 units infront of the Ship
