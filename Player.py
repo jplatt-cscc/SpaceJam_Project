@@ -3,6 +3,8 @@ from direct.task import Task
 from direct.task.Task import TaskManager
 from Collisions import SphereCollider
 from typing import Callable
+from SpaceJamClasses import Missile
+from direct.gui.OnscreenImage import OnscreenImage
 
 
 class Ship(SphereCollider):
@@ -17,6 +19,22 @@ class Ship(SphereCollider):
         self.modelNode.setName(nodeName)
         Texture = loader.loadTexture(texPath)
         self.modelNode.setTexture(Texture, 1)
+        # Missile projectile
+        self.loader = loader
+        self.reloadTime = 0.25
+        # Distance where the missile disapears
+        self.missileDistance = 4000
+        # Launch only 1 missile at a time
+        self.missileBay = 1
+        # ...
+        self.taskMgr.add(self.CheckIntervals, 'checkMissiles', 30)
+
+
+    def EnableHUD(self):
+        """ Crosshair for firing the missile """
+        self.HUD = OnscreenImage(image = './Assets/HUD/Crosshair.png', pos = Vec3(0, 0, 0), scale = 0.1)
+        self.HUD.setTransparency(TransparencyAttrib.MAlpha)
+
 
     def SetKeyBindings(self):
         """ For setting player movement keybinds """
@@ -35,8 +53,69 @@ class Ship(SphereCollider):
         self.accept('q-up', self.LeftRoll, [0])
         self.accept('e', self.RightRoll, [1])
         self.accept('e-up', self.RightRoll, [0])
+        self.accept('f', self.Fire)
 
     
+    def Fire(self):
+        """ For firing the missile """
+        if self.missileBay:
+            travRate = self.missileDistance
+            # Get the front of the Ship
+            aim = self.render.getRelativeVector(self.modelNode, Vec3.forward())
+            aim.normalize()
+            fireSolution = aim * travRate
+            # Missile spawns 100 units infront of the Ship
+            infront = aim * 100
+            posVec = self.modelNode.getPos() + infront
+            travVec = fireSolution + self.modelNode.getPos()
+            # Only 1 missile can be fired at a time
+            self.missileBay -= 1
+            missileTag = 'Missile' + str(Missile.missileCount)
+            # Loads the missile model
+            currentMissile = Missile(self.loader, './Assets/Phaser/phaser.egg', self.render, missileTag, posVec, 4.0)
+            # 'fluid = 1' checks collions between frames so it doesn't phase through things
+            Missile.intervals[missileTag] = currentMissile.modelNode.posInterval(2.0, travVec, startPos = posVec, fluid = 1)
+            Missile.intervals[missileTag].start()
+        else:
+            # If not already reloading
+            if not self.taskMgr.hasTaskNamed('reload'):
+                print('Initializing reload...')
+                # Call the reload method
+                self.taskMgr.doMethodLater(0, self.Reload, 'reload')
+                return Task
+            
+
+    def Reload(self, task):
+        if task.time > self.reloadTime:
+            self.missileBay += 1
+            # Debug
+            print('Done reloading')
+            return Task.done
+        # Safety check
+        if self.missileBay > 1:
+            self.missileBay = 1
+        elif task.time <= self.reloadTime:
+            print('Reload processing...')
+            return Task.cont
+
+    def CheckIntervals(self, task):
+        for i in Missile.intervals:
+            # 'isPlaying' returns True or False if the missile has reached the end of its path/life
+            if not Missile.intervals[i].isPlaying():
+                # Gets rid of the missile
+                Missile.cNodes[i].detachNode()
+                Missile.fireModels[i].detachNode()
+                del Missile.intervals[i]
+                del Missile.fireModels[i]
+                del Missile.cNodes[i]
+                del Missile.collisionSolids[i]
+                print(i + ' has reached the end of its path.')
+                # 'break' fixes the dictionary after things are deleted from it
+                break
+        return Task.cont
+
+
+
     def Thrust(self, keyDown):
         """ For detecting forward movement inputs """
         if keyDown:

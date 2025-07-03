@@ -50,3 +50,24 @@ class SpaceStation(CapsuleCollider):
         self.modelNode.setName(nodeName)
         Texture = loader.loadTexture(texPath)
         self.modelNode.setTexture(Texture, 1)
+
+
+class Missile(SphereCollider):
+    """ For loading the missile model """
+    fireModels = {}
+    cNodes = {}
+    collisionSolids = {}
+    intervals = {}
+    missileCount = 0
+    
+    def __init__(self, loader: Loader, modelPath: str, parentNode: NodePath, nodeName: str, posVec: Vec3, scaleVec: float = 1.0):
+        super(Missile, self).__init__(loader, modelPath, parentNode, nodeName, Vec3(0, 0, 0), 3.0)
+        self.modelNode.setPos(posVec)
+        self.modelNode.setScale(scaleVec)
+        Missile.missileCount += 1
+        Missile.fireModels[nodeName] = self.modelNode
+        Missile.cNodes[nodeName] = self.collisionNode
+        # Debuging
+        Missile.collisionSolids[nodeName] = self.collisionNode.node().getSolid(0)
+        Missile.cNodes[nodeName].show()
+        print('Fire Missile #' + str(Missile.missileCount))
