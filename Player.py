@@ -5,6 +5,10 @@ from Collisions import SphereCollider
 from typing import Callable
 from SpaceJamClasses import Missile
 from direct.gui.OnscreenImage import OnscreenImage
+from direct.interval.LerpInterval import LerpFunc
+from direct.particles.ParticleEffect import ParticleEffect
+# Regex module for editing strings
+import re
 
 
 class Ship(SphereCollider):
@@ -22,12 +26,77 @@ class Ship(SphereCollider):
         # Missile projectile
         self.loader = loader
         self.reloadTime = 0.25
+        # Missile Variables
+        self.ExplodeCount = 0
+        self.explodeIntervals = {}
+        self.traverser = CollisionTraverser()
+        self.handler = CollisionHandlerEvent()
         # Distance where the missile disapears
         self.missileDistance = 4000
         # Launch only 1 missile at a time
         self.missileBay = 1
-        # ...
+        # Missile Collision Detection
         self.taskMgr.add(self.CheckIntervals, 'checkMissiles', 30)
+        self.handler.addInPattern('into')
+        self.accept('into', self.HandleInto)
+
+
+    def HandleInto(self, entry):
+        """ Debuging info for collisions """
+        fromNode = entry.getFromNodePath().getName()
+        print('fromNode: ' + fromNode)
+        intoNode = entry.getIntoNodePath().getName()
+        print('intoNode: ' + intoNode)
+        intoPosition = Vec3(entry.getSurfacePoint(self.render))
+        tempVar = fromNode.split('_')
+        print('tempVar1: ' + str(tempVar))
+        shooter = intoNode.split('_')
+        print('shooter: ' + str(shooter))
+        tempVar = fromNode.split('_')
+        print('tempVar2: ' + str(tempVar))
+        tempVar = fromNode.split('_')
+        print('tempVar3: ' + str(tempVar))
+        victim = tempVar[0]
+        print('victim: ' + str(victim))
+        pattern = r'[0-9]'
+        strippedString = re.sub(pattern, '', victim)
+        if (strippedString == 'Drone' or strippedString == 'Planet' or strippedString == 'Space Station'):
+            print(victim + ' hit at ' + intoPosition)
+            self.DestroyObject(victim, intoPosition)
+        print(shooter + ' is DONE.')
+        Missile.intervals[shooter].finish()
+    
+
+    def DestroyObject(self, hitID, hitPosition):
+        # Finds what the missile hit
+        nodeID = self.render.find(hitID)
+        nodeID.detachNode()
+        # Starts explosion
+        self.explodeNode.setPos(hitPosition)
+        self.Explode()
+
+
+    def Explode(self):
+        """ Explosion animation """
+        self.ExplodeCount += 1
+        tag = 'particles-' + str(self.ExplodeCount)
+        self.explodeIntervals[tag] = LerpFunc(self.ExplodeLight, duration = 4.0)
+        self.explodeIntervals[tag].start()
+
+
+    def ExplodeLight(self, t):
+        if t == 1.0 and self.explodeEffect:
+            self.explodeEffect.disable()
+        elif t == 0:
+            self.explodeEffect.start(self.explodeNode)
+    
+
+    def SetParticles(self):
+        self.enableParticles()
+        self.explodeEffect = ParticleEffect()
+        self.explodeEffect.loadConfig('./Assets/Effects/basic_xpld_efx.ptf')
+        self.explodeEffect.setScale(20)
+        self.explodeNode = self.render.attachNewNode('ExplosionEffects')
 
 
     def EnableHUD(self):
@@ -73,6 +142,8 @@ class Ship(SphereCollider):
             missileTag = 'Missile' + str(Missile.missileCount)
             # Loads the missile model
             currentMissile = Missile(self.loader, './Assets/Phaser/phaser.egg', self.render, missileTag, posVec, 4.0)
+            # Collider Reference
+            self.traverser.addCollider(currentMissile.collisionNode, self.handler)
             # 'fluid = 1' checks collions between frames so it doesn't phase through things
             Missile.intervals[missileTag] = currentMissile.modelNode.posInterval(2.0, travVec, startPos = posVec, fluid = 1)
             Missile.intervals[missileTag].start()

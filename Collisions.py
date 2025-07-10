@@ -5,7 +5,7 @@ class PlacedObject(PandaNode):
     """ . """
     def __init__(self, loader: Loader, modelPath: str, parentNode: NodePath, nodeName: str):
         self.modelNode: NodePath = loader.loadModel(modelPath)
-
+        
         # Error checking
         if not isinstance(self.modelNode, NodePath):
             raise AssertionError('PlacedObject loader.loadModel(' + modelPath + ') did not return a proper PandaNode!')
