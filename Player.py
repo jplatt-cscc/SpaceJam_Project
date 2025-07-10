@@ -10,7 +10,7 @@ from direct.gui.OnscreenImage import OnscreenImage
 class Ship(SphereCollider):
     """ For loading the player model """
     def __init__(self, loader: Loader, taskMgr: TaskManager, accept: Callable[[str, Callable], None], modelPath: str, parentNode: NodePath, nodeName: str, texPath: str, posVec: Vec3, scaleVec: float):
-        super(Ship, self).__init__(loader, modelPath, parentNode, nodeName, Vec3(0, 0, 0), 0.9)
+        super(Ship, self).__init__(loader, modelPath, parentNode, nodeName, Vec3(0.3, 0, 0), 1)
         self.taskMgr = taskMgr
         self.accept = accept
         self.render = parentNode
@@ -32,7 +32,7 @@ class Ship(SphereCollider):
 
     def EnableHUD(self):
         """ Crosshair for firing the missile """
-        self.HUD = OnscreenImage(image = './Assets/HUD/Crosshair.png', pos = Vec3(0, 0, 0), scale = 0.1)
+        self.HUD = OnscreenImage(image = './Assets/HUD/techno.png', pos = Vec3(0, 0, -0.03), scale = 0.05)
         self.HUD.setTransparency(TransparencyAttrib.MAlpha)
 
 

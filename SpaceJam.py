@@ -19,6 +19,7 @@ class SpaceJam(ShowBase):
 
         # Loads models/scene
         self.SetScene()
+        PlayerClass.Ship.EnableHUD(self)
 
         # Spawns drones
         self.SpawnDrones()
@@ -124,7 +125,7 @@ class SpaceJam(ShowBase):
         self.disableMouse()
         self.camera.reparentTo(self.Player.modelNode)
         # Sets the camera behind the ship's engines
-        self.camera.setFluidPos(0, 0, 20)
+        self.camera.setFluidPos(0.3, 1, 20)
         self.camera.setHpr(180, -90, -180)
     
 
