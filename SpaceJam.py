@@ -125,7 +125,7 @@ class SpaceJam(ShowBase):
         self.disableMouse()
         self.camera.reparentTo(self.Player.modelNode)
         # Sets the camera behind the ship's engines
-        self.camera.setFluidPos(0.3, 1, 20)
+        self.camera.setFluidPos(0.3, 1, 10)
         self.camera.setHpr(180, -90, -180)
     
 

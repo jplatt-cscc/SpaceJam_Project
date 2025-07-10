@@ -10,7 +10,7 @@ from direct.gui.OnscreenImage import OnscreenImage
 class Ship(SphereCollider):
     """ For loading the player model """
     def __init__(self, loader: Loader, taskMgr: TaskManager, accept: Callable[[str, Callable], None], modelPath: str, parentNode: NodePath, nodeName: str, texPath: str, posVec: Vec3, scaleVec: float):
-        super(Ship, self).__init__(loader, modelPath, parentNode, nodeName, Vec3(0.3, 0, 0), 1)
+        super(Ship, self).__init__(loader, modelPath, parentNode, nodeName, Vec3(0.3, 0, 0), 1.5)
         self.taskMgr = taskMgr
         self.accept = accept
         self.render = parentNode
@@ -55,7 +55,7 @@ class Ship(SphereCollider):
         self.accept('e-up', self.RightRoll, [0])
         self.accept('f', self.Fire)
 
-    
+
     def Fire(self):
         """ For firing the missile """
         if self.missileBay:
@@ -126,7 +126,7 @@ class Ship(SphereCollider):
 
     def ApplyThrust(self, task):
         """ For applying forward movement """
-        Rate = 5
+        Rate = 15
         Trajectory = self.render.getRelativeVector(self.modelNode, Vec3.down())
         Trajectory.normalize()
         self.modelNode.setFluidPos(self.modelNode.getPos() + Trajectory * Rate)
@@ -145,7 +145,7 @@ class Ship(SphereCollider):
         """ For applying left turn movement """
         # Turns half a degree left per frame
         Rate = 0.5
-        self.modelNode.setR(self.modelNode.getR() + Rate)
+        self.modelNode.setR(self.modelNode, Rate)
         return Task.cont
 
 
@@ -161,7 +161,7 @@ class Ship(SphereCollider):
         """ For applying right turn movement """
         # Turns half a degree right per frame
         Rate = -0.5
-        self.modelNode.setR(self.modelNode.getR() + Rate)
+        self.modelNode.setR(self.modelNode, Rate)
         return Task.cont
     
 
@@ -177,7 +177,7 @@ class Ship(SphereCollider):
         """ For applying Up turn movement """
         # Turns half a degree up per frame
         Rate = 0.5
-        self.modelNode.setP(self.modelNode.getP() + Rate)
+        self.modelNode.setP(self.modelNode, Rate)
         return Task.cont
     
 
@@ -193,7 +193,7 @@ class Ship(SphereCollider):
         """ For applying Down turn movement """
         # Turns half a degree down per frame
         Rate = -0.5
-        self.modelNode.setP(self.modelNode.getP() + Rate)
+        self.modelNode.setP(self.modelNode, Rate)
         return Task.cont
     
 
@@ -209,7 +209,7 @@ class Ship(SphereCollider):
         """ For applying left roll movement """
         # Rolls one a degree left per frame
         Rate = 1
-        self.modelNode.setH(self.modelNode.getH() + Rate)
+        self.modelNode.setH(self.modelNode, Rate)
         return Task.cont
     
 
@@ -225,5 +225,5 @@ class Ship(SphereCollider):
         """ For applying right roll movement """
         # Rolls one a degree right per frame
         Rate = -1
-        self.modelNode.setH(self.modelNode.getH() + Rate)
+        self.modelNode.setH(self.modelNode, Rate)
         return Task.cont
