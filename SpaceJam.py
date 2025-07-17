@@ -1,4 +1,4 @@
-# 7/16/25, CSCI-1551, "Project #6" Space Jam Assignment
+# 7/17/25, CSCI-1551, "Project #7" Space Jam Assignment
 
 # Imports
 from direct.showbase.ShowBase import ShowBase
@@ -53,7 +53,9 @@ class SpaceJam(ShowBase):
         self.Planet6 = SpaceJamClasses.Planet(self.loader, './Assets/Planets/protoPlanet.x', self.render, 'Planet6', './Assets/Planets/texture_planet_6.jpg', (-2000, 50, 300), 350)
         self.SpaceStation = SpaceJamClasses.SpaceStation(self.loader, './Assets/Space Stations/spaceStation.x', self.render, 'Space Station', './Assets/Space Stations/SpaceStation1_Dif2.png', (4567, -934, 123), 40)
         self.Player = PlayerClass.Ship(self.loader, self.taskMgr, self.accept, './Assets/Spaceships/Dumbledore.x', self.render, 'Player', './Assets/Spaceships/spacejet_C.png', (0, 0, 0), 10)
-    
+        self.Sentinal1 = SpaceJamClasses.Orbiter(self.loader, self.taskMgr, './Assets/Drone Defender/DroneDefender.obj', self.render, 'Drone', 10.0, './Assets/Drone Defender/octotoad1_auv.png', self.Planet5, 900, 'MLB', self.Player)
+        self.Sentinal2 = SpaceJamClasses.Orbiter(self.loader, self.taskMgr, './Assets/Drone Defender/DroneDefender.obj', self.render, 'Drone', 10.0, './Assets/Drone Defender/octotoad1_auv.png', self.Planet2, 500, 'Cloud', self.Player)
+
 
     def SpawnDrones(self):
         """ Spawns all drones/drone patterns """
