@@ -25,7 +25,7 @@ class Ship(SphereCollider):
         self.modelNode.setTexture(Texture, 1)
         # Boost mode
         self.thrustRate = 10
-        self.boostTime = 3
+        self.boostTime = 4
         self.boostOn = False
         # For launching the missiles from the wing tips
         self.missileLeft = self.modelNode.attachNewNode('missileLeft')
@@ -223,6 +223,7 @@ class Ship(SphereCollider):
             self.taskMgr.doMethodLater(0, self.Boost, 'Boost-Mode')
             self.taskMgr.doMethodLater(1, self.Boost, 'Boost-Mode')
             self.taskMgr.doMethodLater(2, self.Boost, 'Boost-Mode')
+            self.taskMgr.doMethodLater(3, self.Boost, 'Boost-Mode')
             self.taskMgr.doMethodLater(10, self.BoostReactivate, 'Reactivate-Boost-Mode')
         else:
             print('Boost Mode Already Acivated... Try again in 10 seconds...')
@@ -234,8 +235,8 @@ class Ship(SphereCollider):
         if self.boostTime == 0:
             print('Boost Mode Deactivated')
             self.thrustRate = 10
-            self.boostTime = 3
-        print(self.thrustRate)
+            self.boostTime = 4
+        print('Speed: ' + str(self.thrustRate))
         return Task.done
 
 
