@@ -1,4 +1,4 @@
-# 7/10/25, CSCI-1511, "Project #6" Space Jam Assignment
+# 7/16/25, CSCI-1551, "Project #6" Space Jam Assignment
 
 # Imports
 from direct.showbase.ShowBase import ShowBase

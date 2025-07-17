@@ -1,4 +1,4 @@
-from panda3d.core import PandaNode, Loader, NodePath, CollisionNode, CollisionCapsule, CollisionSphere, CollisionInvSphere, Vec3
+from panda3d.core import PandaNode, Loader, NodePath, CollisionNode, CollisionCapsule, CollisionSphere, CollisionInvSphere, Vec3, CollisionTraverser
 
 
 class PlacedObject(PandaNode):

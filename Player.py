@@ -23,6 +23,15 @@ class Ship(SphereCollider):
         self.modelNode.setName(nodeName)
         Texture = loader.loadTexture(texPath)
         self.modelNode.setTexture(Texture, 1)
+        # Boost mode
+        self.thrustRate = 10
+        self.boostTime = 3
+        self.boostOn = False
+        # For launching the missiles from the wing tips
+        self.missileLeft = self.modelNode.attachNewNode('missileLeft')
+        self.missileRight = self.modelNode.attachNewNode('missileRight')
+        self.missileLeft.setPos(-5, -3, 0)
+        self.missileRight.setPos(4, -2.4, 0)
         # Missile projectile
         self.loader = loader
         self.reloadTime = 0.25
@@ -30,15 +39,26 @@ class Ship(SphereCollider):
         self.ExplodeCount = 0
         self.explodeIntervals = {}
         self.traverser = CollisionTraverser()
+        self.StartTraverserTask()
         self.handler = CollisionHandlerEvent()
+        self.SetParticles()
         # Distance where the missile disapears
         self.missileDistance = 4000
         # Launch only 1 missile at a time
-        self.missileBay = 1
+        self.missileBay = 4
         # Missile Collision Detection
         self.taskMgr.add(self.CheckIntervals, 'checkMissiles', 30)
         self.handler.addInPattern('into')
         self.accept('into', self.HandleInto)
+
+
+    def StartTraverserTask(self):
+        self.taskMgr.add(self.TraverserAddTask, 'collisionTask')
+
+
+    def TraverserAddTask(self, task):
+        self.traverser.traverse(self.render)
+        return Task.cont
 
 
     def HandleInto(self, entry):
@@ -50,18 +70,18 @@ class Ship(SphereCollider):
         intoPosition = Vec3(entry.getSurfacePoint(self.render))
         tempVar = fromNode.split('_')
         print('tempVar1: ' + str(tempVar))
-        shooter = intoNode.split('_')
+        shooter = tempVar[0]
         print('shooter: ' + str(shooter))
-        tempVar = fromNode.split('_')
+        tempVar = intoNode.split('_')
         print('tempVar2: ' + str(tempVar))
-        tempVar = fromNode.split('_')
+        tempVar = intoNode.split('_')
         print('tempVar3: ' + str(tempVar))
         victim = tempVar[0]
         print('victim: ' + str(victim))
         pattern = r'[0-9]'
         strippedString = re.sub(pattern, '', victim)
         if (strippedString == 'Drone' or strippedString == 'Planet' or strippedString == 'Space Station'):
-            print(victim + ' hit at ' + intoPosition)
+            print(str(victim) + ' hit at ' + str(intoPosition))
             self.DestroyObject(victim, intoPosition)
         print(shooter + ' is DONE.')
         Missile.intervals[shooter].finish()
@@ -92,7 +112,7 @@ class Ship(SphereCollider):
     
 
     def SetParticles(self):
-        self.enableParticles()
+        base.enableParticles()
         self.explodeEffect = ParticleEffect()
         self.explodeEffect.loadConfig('./Assets/Effects/basic_xpld_efx.ptf')
         self.explodeEffect.setScale(20)
@@ -122,31 +142,14 @@ class Ship(SphereCollider):
         self.accept('q-up', self.LeftRoll, [0])
         self.accept('e', self.RightRoll, [1])
         self.accept('e-up', self.RightRoll, [0])
-        self.accept('f', self.Fire)
+        self.accept('f', self.Launch)
+        self.accept('shift', self.BoostMode)
 
-
-    def Fire(self):
-        """ For firing the missile """
+    
+    def Launch(self):
         if self.missileBay:
-            travRate = self.missileDistance
-            # Get the front of the Ship
-            aim = self.render.getRelativeVector(self.modelNode, Vec3.down())
-            aim.normalize()
-            fireSolution = aim * travRate
-            # Missile spawns 100 units infront of the Ship
-            infront = aim * 100
-            posVec = self.modelNode.getPos() + infront
-            travVec = fireSolution + self.modelNode.getPos()
-            # Only 1 missile can be fired at a time
-            self.missileBay -= 1
-            missileTag = 'Missile' + str(Missile.missileCount)
-            # Loads the missile model
-            currentMissile = Missile(self.loader, './Assets/Phaser/phaser.egg', self.render, missileTag, posVec, 4.0)
-            # Collider Reference
-            self.traverser.addCollider(currentMissile.collisionNode, self.handler)
-            # 'fluid = 1' checks collions between frames so it doesn't phase through things
-            Missile.intervals[missileTag] = currentMissile.modelNode.posInterval(2.0, travVec, startPos = posVec, fluid = 1)
-            Missile.intervals[missileTag].start()
+            self.taskMgr.doMethodLater(0, self.Fire, 'Left-Missile')
+            self.taskMgr.doMethodLater(0.05, self.Fire, 'Right-Missile')
         else:
             # If not already reloading
             if not self.taskMgr.hasTaskNamed('reload'):
@@ -154,20 +157,47 @@ class Ship(SphereCollider):
                 # Call the reload method
                 self.taskMgr.doMethodLater(0, self.Reload, 'reload')
                 return Task
+
+
+    def Fire(self, task):
+        """ For firing the missile """
+        travRate = self.missileDistance
+        # Get the front of the Ship
+        aim = self.render.getRelativeVector(self.modelNode, Vec3.down())
+        aim.normalize()
+        fireSolution = aim * travRate
+        # Missile spawns 100 units infront of the Ship
+        infront = aim * 100
+        posVec = self.missileLeft.getPos(self.render) + infront
+        if self.missileBay == 3 or self.missileBay == 1:
+            posVec = self.missileRight.getPos(self.render) + infront
+        travVec = fireSolution + self.modelNode.getPos()
+        # Only 1 missile can be fired at a time
+        self.missileBay -= 1
+        missileTag = 'Missile' + str(Missile.missileCount)
+        # Loads the missile model
+        currentMissile = Missile(self.loader, './Assets/Phaser/phaser.egg', self.render, missileTag, posVec, 4.0)
+        # Collider Reference
+        self.traverser.addCollider(currentMissile.collisionNode, self.handler)
+        # 'fluid = 1' checks collions between frames so it doesn't phase through things
+        Missile.intervals[missileTag] = currentMissile.modelNode.posInterval(2.0, travVec, startPos = posVec, fluid = 1)
+        Missile.intervals[missileTag].start()
+        Task.done
             
 
     def Reload(self, task):
         if task.time > self.reloadTime:
-            self.missileBay += 1
+            self.missileBay += 4
             # Debug
             print('Done reloading')
             return Task.done
         # Safety check
-        if self.missileBay > 1:
-            self.missileBay = 1
+        if self.missileBay > 4:
+            self.missileBay = 4
         elif task.time <= self.reloadTime:
             print('Reload processing...')
             return Task.cont
+
 
     def CheckIntervals(self, task):
         for i in Missile.intervals:
@@ -186,7 +216,33 @@ class Ship(SphereCollider):
         return Task.cont
 
 
+    def BoostMode(self):
+        if not self.boostOn:
+            self.boostOn = True
+            print('Boost Mode Activated')
+            self.taskMgr.doMethodLater(0, self.Boost, 'Boost-Mode')
+            self.taskMgr.doMethodLater(1, self.Boost, 'Boost-Mode')
+            self.taskMgr.doMethodLater(2, self.Boost, 'Boost-Mode')
+            self.taskMgr.doMethodLater(10, self.BoostReactivate, 'Reactivate-Boost-Mode')
+        else:
+            print('Boost Mode Already Acivated... Try again in 10 seconds...')
 
+
+    def Boost(self, task):
+        self.thrustRate += 15
+        self.boostTime -= 1
+        if self.boostTime == 0:
+            print('Boost Mode Deactivated')
+            self.thrustRate = 10
+            self.boostTime = 3
+        print(self.thrustRate)
+        return Task.done
+
+
+    def BoostReactivate(self, task):
+        self.boostOn = False
+        return Task.done
+    
     def Thrust(self, keyDown):
         """ For detecting forward movement inputs """
         if keyDown:
@@ -197,10 +253,9 @@ class Ship(SphereCollider):
 
     def ApplyThrust(self, task):
         """ For applying forward movement """
-        Rate = 15
         Trajectory = self.render.getRelativeVector(self.modelNode, Vec3.down())
         Trajectory.normalize()
-        self.modelNode.setFluidPos(self.modelNode.getPos() + Trajectory * Rate)
+        self.modelNode.setFluidPos(self.modelNode.getPos() + Trajectory * self.thrustRate)
         return Task.cont
 
     

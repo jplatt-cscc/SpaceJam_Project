@@ -62,7 +62,7 @@ class Missile(SphereCollider):
     
     def __init__(self, loader: Loader, modelPath: str, parentNode: NodePath, nodeName: str, posVec: Vec3, scaleVec: float = 1.0):
         super(Missile, self).__init__(loader, modelPath, parentNode, nodeName, Vec3(0, 0, 0), 3.0)
-        self.modelNode.setPos(posVec)
+        self.modelNode.setFluidPos(posVec)
         self.modelNode.setScale(scaleVec)
         Missile.missileCount += 1
         Missile.fireModels[nodeName] = self.modelNode
