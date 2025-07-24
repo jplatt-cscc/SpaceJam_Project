@@ -29,6 +29,7 @@ class SpaceJam(ShowBase):
         self.SetCamera()
         # Player movement
         PlayerClass.Ship.SetKeyBindings(self.Player)
+        PlayerClass.Ship.mouseInit(self.Player)
         # Quit game keybind
         self.accept('escape', self.quit)
 
@@ -39,7 +40,7 @@ class SpaceJam(ShowBase):
         self.pusher.addCollider(self.Player.collisionNode, self.Player.modelNode)
         self.cTrav.addCollider(self.Player.collisionNode, self.pusher)
         # Debug Option
-        self.cTrav.showCollisions(self.render)
+        #self.cTrav.showCollisions(self.render)
 
 
     def SetScene(self):
@@ -53,8 +54,12 @@ class SpaceJam(ShowBase):
         self.Planet6 = SpaceJamClasses.Planet(self.loader, './Assets/Planets/protoPlanet.x', self.render, 'Planet6', './Assets/Planets/texture_planet_6.jpg', (-2000, 50, 300), 350)
         self.SpaceStation = SpaceJamClasses.SpaceStation(self.loader, './Assets/Space Stations/spaceStation.x', self.render, 'Space Station', './Assets/Space Stations/SpaceStation1_Dif2.png', (4567, -934, 123), 40)
         self.Player = PlayerClass.Ship(self.loader, self.taskMgr, self.accept, './Assets/Spaceships/Dumbledore.x', self.render, 'Player', './Assets/Spaceships/spacejet_C.png', (0, 0, 0), 10)
-        self.Sentinal1 = SpaceJamClasses.Orbiter(self.loader, self.taskMgr, './Assets/Drone Defender/DroneDefender.obj', self.render, 'Drone', 10.0, './Assets/Drone Defender/octotoad1_auv.png', self.Planet5, 900, 'MLB', self.Player)
-        self.Sentinal2 = SpaceJamClasses.Orbiter(self.loader, self.taskMgr, './Assets/Drone Defender/DroneDefender.obj', self.render, 'Drone', 10.0, './Assets/Drone Defender/octotoad1_auv.png', self.Planet2, 500, 'Cloud', self.Player)
+        self.Sentinal1 = SpaceJamClasses.Orbiter(self.loader, self.taskMgr, './Assets/Drone Defender/DroneDefender.obj', self.render, 'Drone', 10.0, './Assets/Drone Defender/green.jpg', self.Planet1, 900, 'MLB', self.Player)
+        self.Sentinal2 = SpaceJamClasses.Orbiter(self.loader, self.taskMgr, './Assets/Drone Defender/DroneDefender.obj', self.render, 'Drone', 10.0, './Assets/Drone Defender/green.jpg', self.Planet2, 500, 'Cloud', self.Player)
+        self.Sentinal3 = SpaceJamClasses.Orbiter(self.loader, self.taskMgr, './Assets/Drone Defender/DroneDefender.obj', self.render, 'Drone', 10.0, './Assets/Drone Defender/green.jpg', self.Planet3, 900, 'MLB', self.Player)
+        self.Sentinal4 = SpaceJamClasses.Orbiter(self.loader, self.taskMgr, './Assets/Drone Defender/DroneDefender.obj', self.render, 'Drone', 10.0, './Assets/Drone Defender/green.jpg', self.Planet4, 500, 'Cloud', self.Player)
+        self.Sentinal5 = SpaceJamClasses.Orbiter(self.loader, self.taskMgr, './Assets/Drone Defender/DroneDefender.obj', self.render, 'Drone', 10.0, './Assets/Drone Defender/green.jpg', self.Planet5, 900, 'MLB', self.Player)
+        self.Sentinal6 = SpaceJamClasses.Orbiter(self.loader, self.taskMgr, './Assets/Drone Defender/DroneDefender.obj', self.render, 'Drone', 10.0, './Assets/Drone Defender/green.jpg', self.Planet6, 500, 'Cloud', self.Player)
 
 
     def SpawnDrones(self):

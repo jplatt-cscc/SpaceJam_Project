@@ -121,35 +121,51 @@ class Ship(SphereCollider):
 
     def EnableHUD(self):
         """ Crosshair for firing the missile """
-        self.HUD = OnscreenImage(image = './Assets/HUD/techno.png', pos = Vec3(0, 0, -0.03), scale = 0.05)
-        self.HUD.setTransparency(TransparencyAttrib.MAlpha)
+        self.crossHair = OnscreenImage(image = './Assets/HUD/techno.png', pos = Vec3(0, 0, -0.03), scale = 0.05)
+        self.crossHair.setTransparency(TransparencyAttrib.MAlpha)
 
 
     def SetKeyBindings(self):
         """ For setting player movement keybinds """
         # '.getH' for left/right turns | '.getP' for up/down turns | '.getR' for left/right rolls
-        self.accept('space', self.Thrust, [1])
-        self.accept('space-up', self.Thrust, [0])
-        self.accept('a', self.LeftTurn, [1])
-        self.accept('a-up', self.LeftTurn, [0])
-        self.accept('d', self.RightTurn, [1])
-        self.accept('d-up', self.RightTurn, [0])
-        self.accept('w', self.UpTurn, [1])
-        self.accept('w-up', self.UpTurn, [0])
-        self.accept('s', self.DownTurn, [1])
-        self.accept('s-up', self.DownTurn, [0])
-        self.accept('q', self.LeftRoll, [1])
-        self.accept('q-up', self.LeftRoll, [0])
-        self.accept('e', self.RightRoll, [1])
-        self.accept('e-up', self.RightRoll, [0])
-        self.accept('f', self.Launch)
-        self.accept('shift', self.BoostMode)
+        self.accept('w', self.Thrust, [1])
+        self.accept('w-up', self.Thrust, [0])
+        self.accept('s', self.Reverse, [1])
+        self.accept('s-up', self.Reverse, [0])
+        self.accept('a', self.LeftRoll, [1])
+        self.accept('a-up', self.LeftRoll, [0])
+        self.accept('d', self.RightRoll, [1])
+        self.accept('d-up', self.RightRoll, [0])
+        self.accept('space', self.Launch)
+        self.accept('shift', self.BoostMode)    
+
+
+    def mouseInit(self):
+        """ Initialize mouse tracking """
+        self.taskMgr.add(self.mouseTracking, 'mouse-movement')
+    
+
+    def mouseTracking(self, task):
+        """ Player/camera movement via the mouse """
+        if base.mouseWatcherNode.hasMouse():
+            mousePos = base.win.getPointer(0)
+            x = mousePos.getX()
+            y = mousePos.getY()
+            # Divide by 2 to get the center of the screen
+            screenX = int(base.win.getXSize() / 2)
+            screenY = int(base.win.getYSize() / 2)
+            deltaX = x - screenX
+            deltaY = y - screenY
+            self.modelNode.setP(self.modelNode, -deltaY * 0.05)
+            self.modelNode.setR(self.modelNode, -deltaX * 0.05)
+            base.win.movePointer(0, screenX, screenY)
+        return Task.cont
 
     
     def Launch(self):
         if self.missileBay:
             self.taskMgr.doMethodLater(0, self.Fire, 'Left-Missile')
-            self.taskMgr.doMethodLater(0.05, self.Fire, 'Right-Missile')
+            self.taskMgr.doMethodLater(0.1, self.Fire, 'Right-Missile')
         else:
             # If not already reloading
             if not self.taskMgr.hasTaskNamed('reload'):
@@ -244,6 +260,7 @@ class Ship(SphereCollider):
         self.boostOn = False
         return Task.done
     
+
     def Thrust(self, keyDown):
         """ For detecting forward movement inputs """
         if keyDown:
@@ -259,68 +276,19 @@ class Ship(SphereCollider):
         self.modelNode.setFluidPos(self.modelNode.getPos() + Trajectory * self.thrustRate)
         return Task.cont
 
-    
-    def LeftTurn(self, keyDown):
-        """ For detecting left turn inputs """
+    def Reverse(self, keyDown):
+        """ For detecting backwards movement inputs """
         if keyDown:
-            self.taskMgr.add(self.ApplyLeftTurn, 'left-turn')
+            self.taskMgr.add(self.ApplyReverse, 'backwards-thrust')
         else:
-            self.taskMgr.remove('left-turn')
+            self.taskMgr.remove('backwards-thrust')
     
 
-    def ApplyLeftTurn(self, task):
-        """ For applying left turn movement """
-        # Turns half a degree left per frame
-        Rate = 0.5
-        self.modelNode.setR(self.modelNode, Rate)
-        return Task.cont
-
-
-    def RightTurn(self, keyDown):
-        """ For detecting Right turn inputs """
-        if keyDown:
-            self.taskMgr.add(self.ApplyRightTurn, 'right-turn')
-        else:
-            self.taskMgr.remove('right-turn')
-    
-
-    def ApplyRightTurn(self, task):
-        """ For applying right turn movement """
-        # Turns half a degree right per frame
-        Rate = -0.5
-        self.modelNode.setR(self.modelNode, Rate)
-        return Task.cont
-    
-
-    def UpTurn(self, keyDown):
-        """ For detecting up turn inputs """
-        if keyDown:
-            self.taskMgr.add(self.ApplyUpTurn, 'up-turn')
-        else:
-            self.taskMgr.remove('up-turn')
-
-    
-    def ApplyUpTurn(self, task):
-        """ For applying Up turn movement """
-        # Turns half a degree up per frame
-        Rate = 0.5
-        self.modelNode.setP(self.modelNode, Rate)
-        return Task.cont
-    
-
-    def DownTurn(self, keyDown):
-        """ For detecting down turn inputs """
-        if keyDown:
-            self.taskMgr.add(self.ApplyDownTurn, 'down-turn')
-        else:
-            self.taskMgr.remove('down-turn')
-
-
-    def ApplyDownTurn(self, task):
-        """ For applying Down turn movement """
-        # Turns half a degree down per frame
-        Rate = -0.5
-        self.modelNode.setP(self.modelNode, Rate)
+    def ApplyReverse(self, task):
+        """ For applying backwards movement """
+        Trajectory = self.render.getRelativeVector(self.modelNode, Vec3.down())
+        Trajectory.normalize()
+        self.modelNode.setFluidPos(self.modelNode.getPos() - Trajectory * self.thrustRate)
         return Task.cont
     
 
