@@ -1,4 +1,4 @@
-# 7/17/25, CSCI-1551, "Project #7" Space Jam Assignment
+# 7/24/25, CSCI-1551, "Project #8" Space Jam Assignment
 
 # Imports
 from direct.showbase.ShowBase import ShowBase
@@ -59,6 +59,7 @@ class SpaceJam(ShowBase):
         self.Sentinal4 = SpaceJamClasses.Orbiter(self.loader, self.taskMgr, './Assets/Drone Defender/DroneDefender.obj', self.render, 'Drone', 10.0, './Assets/Drone Defender/green.jpg', self.Planet4, 500, 'Cloud', self.Player)
         self.Sentinal5 = SpaceJamClasses.Orbiter(self.loader, self.taskMgr, './Assets/Drone Defender/DroneDefender.obj', self.render, 'Drone', 10.0, './Assets/Drone Defender/green.jpg', self.Planet5, 900, 'MLB', self.Player)
         self.Sentinal6 = SpaceJamClasses.Orbiter(self.loader, self.taskMgr, './Assets/Drone Defender/DroneDefender.obj', self.render, 'Drone', 10.0, './Assets/Drone Defender/green.jpg', self.Planet6, 500, 'Cloud', self.Player)
+        self.Wanderer1 = SpaceJamClasses.Wanderer(self.loader, './Assets/Drone Defender/DroneDefender.obj', self.render, 'Drone', 6.0, './Assets/Drone Defender/octotoad1_auv.png', self.Player)
 
 
     def SpawnDrones(self):

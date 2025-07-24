@@ -129,7 +129,8 @@ class Ship(SphereCollider):
         self.missileHUD = OnscreenImage(image = './Assets/HUD/missilebay4.png', pos = Vec3(-0.9, 0, -0.87), scale = 0.15)
         self.missileHUD.setTransparency(TransparencyAttrib.MAlpha)
         self.boostHUD = OnscreenImage(image = './Assets/HUD/BoostOff.png', pos = Vec3(0.9, 0, -0.89), scale = 0.10)
-        self.speedHUD = OnscreenText(text = f'Ship Speed: {self.thrustRate}', pos = (0, -0.86), scale = 0.07, style = 3)
+        self.boostHUD.setTransparency(TransparencyAttrib.MAlpha)
+        self.speedHUD = OnscreenText(text = f'Ship Speed: {self.thrustRate}', pos = Vec3(0, -0.86), scale = 0.07, style = 3)
         self.taskMgr.add(self.shipSpeed, 'ship-speed')
     
 

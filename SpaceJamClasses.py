@@ -4,6 +4,7 @@ from direct.task.Task import TaskManager
 from Collisions import *
 from typing import Callable
 import DefensePaths as DefensePaths
+from direct.interval.IntervalGlobal import Sequence
 
 
 class Planet(SphereCollider):
@@ -113,3 +114,22 @@ class Orbiter(SphereCollider):
 
         self.modelNode.lookAt(self.staringAt.modelNode)
         return task.cont        
+
+
+class Wanderer(SphereCollider):
+    numWanderers = 0
+
+    def __init__(self, loader: Loader, modelPath: str, parentNode: NodePath, nodeName: str, scaleVec: Vec3, texPath: str, staringAt: Vec3):
+        super(Orbiter, self).__init__(loader, modelPath, parentNode, nodeName, Vec3(0, 0, 0), 3.2)
+
+        self.modelNode.setScale(scaleVec)
+        tex = loader.loadTexture(texPath)
+        self.modelNode.setTexture(tex, 1)
+        self.staringAt = staringAt
+        Wanderer.numWanderers += 1
+
+        posInterval0 = self.modelNode.posInterval(20, Vec3(300, 6000, 500), startPos = Vec3(100, 50, 100))
+        posInterval1 = self.modelNode.posInterval(20, Vec3(700, -2000, 100), startPos = Vec3(300, 6000, 500))
+        posInterval2 = self.modelNode.posInterval(20, Vec3(0, -900, -1400), startPos = Vec3(00, -2000, 100))
+        self.travelRoute = Sequence(posInterval0, posInterval1, posInterval2, name = 'Traveler')
+        self.travelRoute.loop()
