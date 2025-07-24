@@ -5,6 +5,7 @@ from Collisions import SphereCollider
 from typing import Callable
 from SpaceJamClasses import Missile
 from direct.gui.OnscreenImage import OnscreenImage
+from direct.gui.OnscreenText import OnscreenText
 from direct.interval.LerpInterval import LerpFunc
 from direct.particles.ParticleEffect import ParticleEffect
 # Regex module for editing strings
@@ -24,7 +25,7 @@ class Ship(SphereCollider):
         Texture = loader.loadTexture(texPath)
         self.modelNode.setTexture(Texture, 1)
         # Boost mode
-        self.thrustRate = 10
+        self.thrustRate = 0
         self.boostTime = 4
         self.boostOn = False
         # For launching the missiles from the wing tips
@@ -50,6 +51,8 @@ class Ship(SphereCollider):
         self.taskMgr.add(self.CheckIntervals, 'checkMissiles', 30)
         self.handler.addInPattern('into')
         self.accept('into', self.HandleInto)
+        # Enables/inits HUD
+        self.EnableHUD()
 
 
     def StartTraverserTask(self):
@@ -84,7 +87,7 @@ class Ship(SphereCollider):
             print(str(victim) + ' hit at ' + str(intoPosition))
             self.DestroyObject(victim, intoPosition)
         print(shooter + ' is DONE.')
-        Missile.intervals[shooter].finish()
+        #Missile.intervals[shooter].finish()
     
 
     def DestroyObject(self, hitID, hitPosition):
@@ -121,8 +124,19 @@ class Ship(SphereCollider):
 
     def EnableHUD(self):
         """ Crosshair for firing the missile """
-        self.crossHair = OnscreenImage(image = './Assets/HUD/techno.png', pos = Vec3(0, 0, -0.03), scale = 0.05)
+        self.crossHair = OnscreenImage(image = './Assets/HUD/techno.png', pos = Vec3(0, 0, -0.04), scale = 0.05)
         self.crossHair.setTransparency(TransparencyAttrib.MAlpha)
+        self.missileHUD = OnscreenImage(image = './Assets/HUD/missilebay4.png', pos = Vec3(-0.9, 0, -0.87), scale = 0.15)
+        self.missileHUD.setTransparency(TransparencyAttrib.MAlpha)
+        self.boostHUD = OnscreenImage(image = './Assets/HUD/BoostOff.png', pos = Vec3(0.9, 0, -0.89), scale = 0.10)
+        self.speedHUD = OnscreenText(text = f'Ship Speed: {self.thrustRate}', pos = (0, -0.86), scale = 0.07, style = 3)
+        self.taskMgr.add(self.shipSpeed, 'ship-speed')
+    
+
+    def shipSpeed(self, task):
+        self.speedHUD.destroy()
+        self.speedHUD = OnscreenText(text = f'Ship Speed: {self.thrustRate}', pos = (0, -0.86), scale = 0.07, style = 3)
+        return Task.cont
 
 
     def SetKeyBindings(self):
@@ -187,9 +201,13 @@ class Ship(SphereCollider):
         posVec = self.missileLeft.getPos(self.render) + infront
         if self.missileBay == 3 or self.missileBay == 1:
             posVec = self.missileRight.getPos(self.render) + infront
+            self.missileHUD.setImage('./Assets/HUD/missilebay2.png')
+            self.missileHUD.setTransparency(TransparencyAttrib.MAlpha)
         travVec = fireSolution + self.modelNode.getPos()
         # Only 1 missile can be fired at a time
         self.missileBay -= 1
+        if self.missileBay == 0:
+            self.missileHUD.destroy()
         missileTag = 'Missile' + str(Missile.missileCount)
         # Loads the missile model
         currentMissile = Missile(self.loader, './Assets/Phaser/phaser.egg', self.render, missileTag, posVec, 4.0)
@@ -204,6 +222,8 @@ class Ship(SphereCollider):
     def Reload(self, task):
         if task.time > self.reloadTime:
             self.missileBay += 4
+            self.missileHUD = OnscreenImage(image = './Assets/HUD/missilebay4.png', pos = Vec3(-0.9, 0, -0.87), scale = 0.15)
+            self.missileHUD.setTransparency(TransparencyAttrib.MAlpha)
             # Debug
             print('Done reloading')
             return Task.done
@@ -235,6 +255,8 @@ class Ship(SphereCollider):
     def BoostMode(self):
         if not self.boostOn:
             self.boostOn = True
+            self.boostHUD.setImage('./Assets/HUD/BoostOn.png')
+            self.boostHUD.setTransparency(TransparencyAttrib.MAlpha)
             print('Boost Mode Activated')
             self.taskMgr.doMethodLater(0, self.Boost, 'Boost-Mode')
             self.taskMgr.doMethodLater(1, self.Boost, 'Boost-Mode')
@@ -252,12 +274,16 @@ class Ship(SphereCollider):
             print('Boost Mode Deactivated')
             self.thrustRate = 10
             self.boostTime = 4
+            self.boostHUD.setImage('./Assets/HUD/BoostCooldown.png')
+            self.boostHUD.setTransparency(TransparencyAttrib.MAlpha)
         print('Speed: ' + str(self.thrustRate))
         return Task.done
 
 
     def BoostReactivate(self, task):
         self.boostOn = False
+        self.boostHUD.setImage('./Assets/HUD/BoostOff.png')
+        self.boostHUD.setTransparency(TransparencyAttrib.MAlpha)
         return Task.done
     
 
@@ -265,7 +291,11 @@ class Ship(SphereCollider):
         """ For detecting forward movement inputs """
         if keyDown:
             self.taskMgr.add(self.ApplyThrust, 'forward-thrust')
+            self.thrustRate += 10
+            self.speedHUD.destroy()
+            self.speedHUD = OnscreenText(text = f'Ship Speed: {self.thrustRate}', pos = (0, -0.86), scale = 0.07, style = 3)
         else:
+            self.thrustRate = 0
             self.taskMgr.remove('forward-thrust')
     
 
@@ -280,7 +310,9 @@ class Ship(SphereCollider):
         """ For detecting backwards movement inputs """
         if keyDown:
             self.taskMgr.add(self.ApplyReverse, 'backwards-thrust')
+            self.thrustRate += 10
         else:
+            self.thrustRate = 0
             self.taskMgr.remove('backwards-thrust')
     
 

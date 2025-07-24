@@ -19,7 +19,6 @@ class SpaceJam(ShowBase):
 
         # Loads models/scene
         self.SetScene()
-        PlayerClass.Ship.EnableHUD(self)
 
         # Spawns drones
         self.SpawnDrones()
@@ -67,7 +66,7 @@ class SpaceJam(ShowBase):
         FullCycle = 60
         x = 0
         for i in range(FullCycle):
-            NickName = 'Drone' + str(SpaceJamClasses.Drones.DroneCount)
+            NickName = 'Drone'
             self.DrawCloudDefense(self.Planet1, NickName)
             SpaceJamClasses.Drones.DroneCount += 1
             self.DrawCloudDefense(self.Planet2, NickName)
@@ -93,6 +92,7 @@ class SpaceJam(ShowBase):
         
     
     def DrawBaseballSeams(self, centralObject, droneName, step, numSeams, radius = 1):
+        droneName +=  str(SpaceJamClasses.Drones.DroneCount)
         UnitVector = DefensePaths.BaseballSeams(step, numSeams, B = 0.4)
         UnitVector.normalize()
         position = UnitVector * radius * 250 + centralObject.modelNode.getPos()
@@ -100,6 +100,7 @@ class SpaceJam(ShowBase):
 
 
     def DrawCloudDefense(self, centralObject, droneName):
+        droneName +=  str(SpaceJamClasses.Drones.DroneCount)
         UnitVector = DefensePaths.Cloud()
         UnitVector.normalize()
         position = UnitVector * 500 + centralObject.modelNode.getPos()
@@ -107,6 +108,7 @@ class SpaceJam(ShowBase):
 
     
     def DrawCircleY(self, x, droneName):
+        droneName +=  str(SpaceJamClasses.Drones.DroneCount)
         UnitVector = DefensePaths.CircleY(x)
         UnitVector.normalize()
         position = UnitVector * 100
@@ -114,6 +116,7 @@ class SpaceJam(ShowBase):
 
     
     def DrawCircleX(self, x, droneName):
+        droneName +=  str(SpaceJamClasses.Drones.DroneCount)
         UnitVector = DefensePaths.CircleX(x)
         UnitVector.normalize()
         position = UnitVector * 100
@@ -121,6 +124,7 @@ class SpaceJam(ShowBase):
 
 
     def DrawCircleZ(self, x, droneName):
+        droneName +=  str(SpaceJamClasses.Drones.DroneCount)
         UnitVector = DefensePaths.CircleZ(x)
         UnitVector.normalize()
         position = UnitVector * 100
