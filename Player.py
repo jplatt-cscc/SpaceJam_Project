@@ -3,7 +3,7 @@ from direct.task import Task
 from direct.task.Task import TaskManager
 from Collisions import SphereCollider
 from typing import Callable
-from SpaceJamClasses import Missile
+from SpaceJamClasses import Missile, SpaceStation
 from direct.gui.OnscreenImage import OnscreenImage
 from direct.gui.OnscreenText import OnscreenText
 from direct.interval.LerpInterval import LerpFunc
@@ -14,7 +14,7 @@ import re
 
 class Ship(SphereCollider):
     """ For loading the player model """
-    def __init__(self, loader: Loader, taskMgr: TaskManager, accept: Callable[[str, Callable], None], modelPath: str, parentNode: NodePath, nodeName: str, texPath: str, posVec: Vec3, scaleVec: float):
+    def __init__(self, loader: Loader, taskMgr: TaskManager, accept: Callable[[str, Callable], None], modelPath: str, parentNode: NodePath, nodeName: str, texPath: str, posVec: Vec3, scaleVec: float, spaceStation):
         super(Ship, self).__init__(loader, modelPath, parentNode, nodeName, Vec3(0.3, 0, 0), 1.5)
         self.taskMgr = taskMgr
         self.accept = accept
@@ -53,6 +53,8 @@ class Ship(SphereCollider):
         self.accept('into', self.HandleInto)
         # Enables/inits HUD
         self.EnableHUD()
+        # Space Station stuff
+        self.spaceStation = spaceStation
 
 
     def StartTraverserTask(self):
@@ -83,9 +85,15 @@ class Ship(SphereCollider):
         print('victim: ' + str(victim))
         pattern = r'[0-9]'
         strippedString = re.sub(pattern, '', victim)
-        if (strippedString == 'Drone' or strippedString == 'Planet' or strippedString == 'Space Station'):
+        if (strippedString == 'Drone' or strippedString == 'Planet'):
             print(str(victim) + ' hit at ' + str(intoPosition))
             self.DestroyObject(victim, intoPosition)
+        elif strippedString == 'Space Station':
+            if SpaceStation.stationHP > 0:
+                SpaceStation.stationHP -= 1
+            else:
+                print(str(victim) + ' hit at ' + str(intoPosition))
+                self.DestroyObject(victim, intoPosition)
         print(shooter + ' is DONE.')
         #Missile.intervals[shooter].finish()
     
@@ -152,7 +160,35 @@ class Ship(SphereCollider):
         self.accept('d', self.RightRoll, [1])
         self.accept('d-up', self.RightRoll, [0])
         self.accept('space', self.Launch)
-        self.accept('shift', self.BoostMode)    
+        self.accept('shift', self.BoostMode)
+
+
+    def PlayerDistance(self, task):
+        """ Updates distance check between the player and the space station """
+        SpaceStation.shipDistance = int(self.modelNode.getDistance(self.spaceStation.modelNode))
+        #print(SpaceStation.shipDistance)
+        if SpaceStation.shipDistance <= 110 and SpaceStation.stationHP > 0:
+            self.taskMgr.doMethodLater(0.5, self.StationShoot, 'Station-Missile')
+        elif SpaceStation.stationHP <= 0:
+            return Task.done
+        return Task.again
+    
+
+    def StationShoot(self, task):
+        """ Shoots missiles near the player ship """
+        aim = self.spaceStation.modelNode.getRelativeVector(self.modelNode, Vec3.down())
+        aim = -aim
+        aim.normalize()
+        infront = aim * 250
+        posVec = self.spaceStation.modelNode.getPos(self.render) + infront
+        travRate = 4250
+        fireSolution = aim * travRate
+        travVec = fireSolution + self.spaceStation.modelNode.getPos()
+        stationMisTag = 'Missile' + str(Missile.missileCount)
+        stationMissile = Missile(self.loader, './Assets/Phaser/phaser.egg', self.render, stationMisTag, posVec, 5.0)
+        Missile.intervals[stationMisTag] = stationMissile.modelNode.posInterval(2.0, travVec, startPos = posVec, fluid = 1)
+        Missile.intervals[stationMisTag].start()
+        return Task.done
 
 
     def mouseInit(self):
@@ -295,6 +331,8 @@ class Ship(SphereCollider):
             self.thrustRate += 10
             self.speedHUD.destroy()
             self.speedHUD = OnscreenText(text = f'Ship Speed: {self.thrustRate}', pos = (0, -0.86), scale = 0.07, style = 3)
+            if SpaceStation.stationHP > 0:
+                self.taskMgr.doMethodLater(0.5, self.PlayerDistance, 'Distane-Check')
         else:
             self.thrustRate = 0
             self.taskMgr.remove('forward-thrust')

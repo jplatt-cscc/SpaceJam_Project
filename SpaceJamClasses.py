@@ -45,6 +45,9 @@ class Universe(InverseSphereCollider):
 
 class SpaceStation(CapsuleCollider):
     """ For loading the space station model """
+    stationHP = 20
+    shipDistance = 5000
+
     def __init__(self, loader: Loader, modelPath: str, parentNode: NodePath, nodeName: str, texPath: str, posVec: Vec3, scaleVec: float):
         super(SpaceStation, self).__init__(loader, modelPath, parentNode, nodeName, 1, -1, 5, 1, -1, -5, 10)
         self.modelNode.setPos(posVec)
@@ -71,8 +74,8 @@ class Missile(SphereCollider):
         Missile.cNodes[nodeName] = self.collisionNode
         # Debuging
         Missile.collisionSolids[nodeName] = self.collisionNode.node().getSolid(0)
-        Missile.cNodes[nodeName].show()
-        print('Fire Missile #' + str(Missile.missileCount))
+        #Missile.cNodes[nodeName].show()
+        #print('Fire Missile #' + str(Missile.missileCount))
 
 
 class Orbiter(SphereCollider):
@@ -120,7 +123,7 @@ class Wanderer(SphereCollider):
     numWanderers = 0
 
     def __init__(self, loader: Loader, modelPath: str, parentNode: NodePath, nodeName: str, scaleVec: Vec3, texPath: str, staringAt: Vec3):
-        super(Orbiter, self).__init__(loader, modelPath, parentNode, nodeName, Vec3(0, 0, 0), 3.2)
+        super(Wanderer, self).__init__(loader, modelPath, parentNode, nodeName, Vec3(0, 0, 0), 3.2)
 
         self.modelNode.setScale(scaleVec)
         tex = loader.loadTexture(texPath)
@@ -128,8 +131,16 @@ class Wanderer(SphereCollider):
         self.staringAt = staringAt
         Wanderer.numWanderers += 1
 
-        posInterval0 = self.modelNode.posInterval(20, Vec3(300, 6000, 500), startPos = Vec3(100, 50, 100))
-        posInterval1 = self.modelNode.posInterval(20, Vec3(700, -2000, 100), startPos = Vec3(300, 6000, 500))
-        posInterval2 = self.modelNode.posInterval(20, Vec3(0, -900, -1400), startPos = Vec3(00, -2000, 100))
-        self.travelRoute = Sequence(posInterval0, posInterval1, posInterval2, name = 'Traveler')
-        self.travelRoute.loop()
+        if self.numWanderers == 1:
+            posInterval0 = self.modelNode.posInterval(20, Vec3(0, 0, 0), startPos = Vec3(100, 50, 100))
+            posInterval1 = self.modelNode.posInterval(20, Vec3(700, -2000, 100), startPos = Vec3(0, 0, 0))
+            posInterval2 = self.modelNode.posInterval(20, Vec3(0, -900, -1400), startPos = Vec3(00, -2000, 100))
+            self.travelRoute = Sequence(posInterval0, posInterval1, posInterval2, name = 'Traveler1')
+            self.travelRoute.loop()
+        else:
+            posInterval0 = self.modelNode.posInterval(20, Vec3(0, 0, 0), startPos = Vec3(-100, -50, -100))
+            posInterval1 = self.modelNode.posInterval(20, Vec3(-700, 2000, -100), startPos = Vec3(0, 0, 0))
+            posInterval2 = self.modelNode.posInterval(20, Vec3(0, 900, 1400), startPos = Vec3(-700, 2000, -100))
+            self.travelRoute = Sequence(posInterval0, posInterval1, posInterval2, name = 'Traveler2')
+            self.travelRoute.loop()
+

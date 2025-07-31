@@ -1,4 +1,4 @@
-# 7/24/25, CSCI-1551, "Project #8" Space Jam Assignment
+# 7/30/25, CSCI-1551, "Project #8" Space Jam Assignment
 
 # Imports
 from direct.showbase.ShowBase import ShowBase
@@ -52,14 +52,15 @@ class SpaceJam(ShowBase):
         self.Planet5 = SpaceJamClasses.Planet(self.loader, './Assets/Planets/protoPlanet.x', self.render, 'Planet5', './Assets/Planets/texture_planet_5.jpg', (133, 7500, -999), 350)
         self.Planet6 = SpaceJamClasses.Planet(self.loader, './Assets/Planets/protoPlanet.x', self.render, 'Planet6', './Assets/Planets/texture_planet_6.jpg', (-2000, 50, 300), 350)
         self.SpaceStation = SpaceJamClasses.SpaceStation(self.loader, './Assets/Space Stations/spaceStation.x', self.render, 'Space Station', './Assets/Space Stations/SpaceStation1_Dif2.png', (4567, -934, 123), 40)
-        self.Player = PlayerClass.Ship(self.loader, self.taskMgr, self.accept, './Assets/Spaceships/Dumbledore.x', self.render, 'Player', './Assets/Spaceships/spacejet_C.png', (0, 0, 0), 10)
-        self.Sentinal1 = SpaceJamClasses.Orbiter(self.loader, self.taskMgr, './Assets/Drone Defender/DroneDefender.obj', self.render, 'Drone', 10.0, './Assets/Drone Defender/green.jpg', self.Planet1, 900, 'MLB', self.Player)
-        self.Sentinal2 = SpaceJamClasses.Orbiter(self.loader, self.taskMgr, './Assets/Drone Defender/DroneDefender.obj', self.render, 'Drone', 10.0, './Assets/Drone Defender/green.jpg', self.Planet2, 500, 'Cloud', self.Player)
-        self.Sentinal3 = SpaceJamClasses.Orbiter(self.loader, self.taskMgr, './Assets/Drone Defender/DroneDefender.obj', self.render, 'Drone', 10.0, './Assets/Drone Defender/green.jpg', self.Planet3, 900, 'MLB', self.Player)
-        self.Sentinal4 = SpaceJamClasses.Orbiter(self.loader, self.taskMgr, './Assets/Drone Defender/DroneDefender.obj', self.render, 'Drone', 10.0, './Assets/Drone Defender/green.jpg', self.Planet4, 500, 'Cloud', self.Player)
-        self.Sentinal5 = SpaceJamClasses.Orbiter(self.loader, self.taskMgr, './Assets/Drone Defender/DroneDefender.obj', self.render, 'Drone', 10.0, './Assets/Drone Defender/green.jpg', self.Planet5, 900, 'MLB', self.Player)
-        self.Sentinal6 = SpaceJamClasses.Orbiter(self.loader, self.taskMgr, './Assets/Drone Defender/DroneDefender.obj', self.render, 'Drone', 10.0, './Assets/Drone Defender/green.jpg', self.Planet6, 500, 'Cloud', self.Player)
-        self.Wanderer1 = SpaceJamClasses.Wanderer(self.loader, './Assets/Drone Defender/DroneDefender.obj', self.render, 'Drone', 6.0, './Assets/Drone Defender/octotoad1_auv.png', self.Player)
+        self.Player = PlayerClass.Ship(self.loader, self.taskMgr, self.accept, './Assets/Spaceships/Dumbledore.x', self.render, 'Player', './Assets/Spaceships/spacejet_C.png', (0, 0, 0), 10, self.SpaceStation)
+        self.Sentinal1 = SpaceJamClasses.Orbiter(self.loader, self.taskMgr, './Assets/Drone Defender/DroneDefender.obj', self.render, 'Drone01', 10.0, './Assets/Drone Defender/green.jpg', self.Planet1, 900, 'MLB', self.Player)
+        self.Sentinal2 = SpaceJamClasses.Orbiter(self.loader, self.taskMgr, './Assets/Drone Defender/DroneDefender.obj', self.render, 'Drone02', 10.0, './Assets/Drone Defender/green.jpg', self.Planet2, 500, 'Cloud', self.Player)
+        self.Sentinal3 = SpaceJamClasses.Orbiter(self.loader, self.taskMgr, './Assets/Drone Defender/DroneDefender.obj', self.render, 'Drone03', 10.0, './Assets/Drone Defender/green.jpg', self.Planet3, 900, 'MLB', self.Player)
+        self.Sentinal4 = SpaceJamClasses.Orbiter(self.loader, self.taskMgr, './Assets/Drone Defender/DroneDefender.obj', self.render, 'Drone04', 10.0, './Assets/Drone Defender/green.jpg', self.Planet4, 500, 'Cloud', self.Player)
+        self.Sentinal5 = SpaceJamClasses.Orbiter(self.loader, self.taskMgr, './Assets/Drone Defender/DroneDefender.obj', self.render, 'Drone05', 10.0, './Assets/Drone Defender/green.jpg', self.Planet5, 900, 'MLB', self.Player)
+        self.Sentinal6 = SpaceJamClasses.Orbiter(self.loader, self.taskMgr, './Assets/Drone Defender/DroneDefender.obj', self.render, 'Drone06', 10.0, './Assets/Drone Defender/green.jpg', self.Planet6, 500, 'Cloud', self.Player)
+        self.Wanderer1 = SpaceJamClasses.Wanderer(self.loader, './Assets/Drone Defender/DroneDefender.obj', self.render, 'Drone07', 8.0, './Assets/Drone Defender/octotoad1_auv.png', self.Player)
+        self.Wanderer2 = SpaceJamClasses.Wanderer(self.loader, './Assets/Drone Defender/DroneDefender.obj', self.render, 'Drone08', 8.0, './Assets/Drone Defender/octotoad1_auv.png', self.Player)
 
 
     def SpawnDrones(self):
@@ -147,4 +148,4 @@ class SpaceJam(ShowBase):
 
 
 app = SpaceJam()
-app.run()
+app.run() 
